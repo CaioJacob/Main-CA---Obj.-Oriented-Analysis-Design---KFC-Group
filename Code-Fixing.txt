@@ -104,3 +104,17 @@ Medium-Risk Problems
   - Acceptance:
     - Queries produce expected counts on sample DB.
     - No SUM(expr = 0) constructs remain.
+
+3. Inconsistent password API: callers use setPassword(...) but User exposes setPasswordHash(...)
+- Problem
+  - Several classes (Officer, Lecturer, Admin) call setPassword(newPassword) or setPassword on User instances; User currently has setPasswordHash(...) only. This causes compile errors or inconsistent behavior.
+- Resolution
+  - Provide a clear API: either (A) remove direct setPassword calls and always use UserManager.modifyPassword(username, newPassword) OR (B) add User.setPassword(String plainPassword) that hashes the password (using BCrypt) and updates passwordHash. Prefer option A for central control, but quick fix is option B plus note to refactor later.
+- Conventional commit
+  - fix(user): add setPassword(String) helper that hashes and sets passwordHash
+- Issue title
+  - Fix inconsistent password setter usage; centralize password changes
+- Issue description
+  - Make User class provide setPassword(String plainPassword) that performs secure hashing (BCrypt) and stores the hash, OR refactor callers to use UserManager.modifyPassword exclusively. Acceptance:
+    - Project compiles without undefined method errors.
+    - Password setter stores hashed password.
