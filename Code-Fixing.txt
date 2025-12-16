@@ -32,3 +32,18 @@
     - No plaintext passwords persisted in memory fields for long-term storage.
     - Authentication passes with correct password and fails with incorrect one.
     - Unit tests added for hashing and verification.
+
+3. UserManager: duplicate usernames allowed and API lacks status returns
+- Problem
+  - addUser does not detect duplicate usernames and does not return success boolean. modifyUsername doesn't check for existence/uniqueness of new username. This leads to conflicting users and ambiguous admin flows.
+- Resolution
+  - Make addUser return boolean (success/fail). Before adding, check doesUserExist(username). modifyUsername should ensure newUsername isn't already used and should return boolean. Update all call sites to handle boolean return and show proper messages.
+- Conventional commit
+  - fix(user): prevent duplicate usernames and make add/modify return boolean
+- Issue title
+  - Prevent duplicate usernames and return status on add/modify operations
+- Issue description
+  - Update UserManager.addUser and modifyUsername to return boolean success status. addUser must check for existing username and refuse duplicates. modifyUsername must fail if new username is taken. Update UI flows (Admin.modifyUser, Admin.processAdminCommand, Officer/Lecturer client code) to handle returned status and inform user. Acceptance criteria:
+    - Trying to create a username that already exists returns false and does not create a new user.
+    - Attempt to rename to an existing username fails and returns false.
+    - UI displays clear success/failure messages.
