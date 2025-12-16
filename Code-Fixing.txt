@@ -47,3 +47,23 @@
     - Trying to create a username that already exists returns false and does not create a new user.
     - Attempt to rename to an existing username fails and returns false.
     - UI displays clear success/failure messages.
+
+4. Faulty / non-portable SQL and ambiguous aliases in report queries
+- Problem
+  - Queries use expressions like SUM(sm.Enrolled = 0) (MySQL boolean-to-int trick), GROUP_CONCAT with conditional WHEN ... = 0 that may be logically inverted, and column aliases contain spaces / backticks. These queries are fragile, hard to read and may produce wrong aggregates.
+- Resolution
+  - Rewrite queries to be explicit and portable: use COUNT(CASE WHEN ... THEN 1 END) for counts, use GROUP_CONCAT(DISTINCT CASE WHEN ... THEN m.ModuleName END SEPARATOR '; ') with correct conditions, remove spaces in alias names (use ModuleName, EnrolledModules, etc.). Add unit tests or run queries against sample DB to validate results.
+- Conventional commit
+  - fix(sql): correct and sanitize report SQL queries for portability and clarity
+- Issue title
+Fix report SQL queries (aggregations and aliases) and validate results
+- Issue description
+  - Update StudentReportVariables, LecturerReportVariables and CourseReportVariables SQL strings to:
+    - Use explicit COUNT(CASE WHEN ... THEN 1 END) constructs for counts
+    - Correct conditional logic for which modules are "teaching" / "can teach"
+    - Use safe column aliases (no spaces, no backticks)
+    - Add a short SQL test (or sample data) to verify expected output for each report.
+  - Acceptance criteria:
+    - Queries return correct counts and module lists on sample data.
+    - No query uses boolean-to-int tricks like SUM(expr = 0) or aliases with spaces.
+    - Output columns map to ReportConstructor getters reliably.
