@@ -13,3 +13,22 @@
     - DatabaseConnection.getConnection() uses env vars when present.
     - Officer/Lecturer compile and run using DatabaseConnection only
 
+2. Plaintext password storage and authentication
+- Problem
+  - UserManager stores passwords in plaintext and compares them directly — severe security issue.
+- Resolution
+  - Store password hashes (bcrypt). When creating or changing a password, hash it. When authenticating, verify using bcrypt. Use a small bcrypt library (e.g., jBCrypt org.mindrot.jbcrypt.BCrypt). Update User to store hashedPassword (and remove public/plain field access). Update UserManager.addUser, modifyPassword and getUser accordingly.
+- Conventional commit
+  - feat(auth): add bcrypt password hashing and verification
+- Issue title
+  - Implement password hashing (bcrypt) and update authentication logic
+- Issue description
+  - Replace plaintext password handling with secure hashing using bcrypt. Update User class to hold a hashed password and change UserManager methods:
+    - addUser(username, password, ...) must hash password before storing
+    - modifyPassword must hash new password
+    - getUser must verify the plain password against stored hash
+    - Update any client code accordingly.
+  - Acceptance criteria:
+    - No plaintext passwords persisted in memory fields for long-term storage.
+    - Authentication passes with correct password and fails with incorrect one.
+    - Unit tests added for hashing and verification.
