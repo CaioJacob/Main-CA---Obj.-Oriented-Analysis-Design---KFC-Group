@@ -45,10 +45,10 @@ public class StudentReportVariables {
                 
                 // Assign values to variable
                 
-                String student = rs.getString("student");
+                String student = rs.getString("Student");
                 String programme = rs.getString("Programme");
-                String enrolledModules = rs.getString("Enrolled Modules");
-                String completedModulesAndGrades = rs.getString("Grades");
+                String enrolledModules = rs.getString("EnrolledModules");
+                String completedModulesAndGrades = rs.getString("CompletedModulesAndGrades");
                 String toRepeatModule = rs.getString("ToRepeat");
 
                 students.add(new StudentReportConstructor(student, programme, enrolledModules, completedModulesAndGrades, toRepeatModule));
