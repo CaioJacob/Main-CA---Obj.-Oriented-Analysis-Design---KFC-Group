@@ -19,7 +19,16 @@ import java.util.List;
 public class LecturerReportVariables {
     
     // Declared as final so that it can only be assigned to the right query
-    public static final String sql = "SELECT l.LecturerName, l.LecturerRole, GROUP_CONCAT(DISTINCT CASE WHEN lm.IsTeaching = 0 THEN m.ModuleName END SEPARATOR '; ') AS ModulesTeaching, SUM(sm.Enrolled = 0) AS NumberOfStudents, GROUP_CONCAT(DISTINCT CASE WHEN lm.CanTeach = 0 THEN m.ModuleName END SEPARATOR '; ') AS CanTeach FROM lecturer l LEFT JOIN lecturermodule lm ON l.LecturerNumber = lm.LecturerNumber LEFT JOIN module m ON lm.ModuleID = m.ModuleID LEFT JOIN studentmodule sm ON m.ModuleID = sm.ModuleID GROUP BY l.LecturerName, l.LecturerRole;";
+    public static final String sql =
+  "SELECT l.LecturerName AS LecturerName, l.LecturerRole AS LecturerRole, " +
+  "GROUP_CONCAT(DISTINCT CASE WHEN lm.IsTeaching = 1 THEN m.ModuleName END SEPARATOR '; ') AS ModulesTeaching, " +
+  "COUNT(DISTINCT CASE WHEN sm.Enrolled = 1 THEN sm.StudentNumber END) AS NumberOfStudents, " +
+  "GROUP_CONCAT(DISTINCT CASE WHEN lm.CanTeach = 1 THEN m.ModuleName END SEPARATOR '; ') AS CanTeach " +
+  "FROM lecturer l " +
+  "LEFT JOIN lecturermodule lm ON l.LecturerNumber = lm.LecturerNumber " +
+  "LEFT JOIN module m ON lm.ModuleID = m.ModuleID " +
+  "LEFT JOIN studentmodule sm ON m.ModuleID = sm.ModuleID " +
+  "GROUP BY l.LecturerName, l.LecturerRole;";
         
     public static List<LecturerReportConstructor> fetchLecturerInfo(String url, String user, String password) {
     
