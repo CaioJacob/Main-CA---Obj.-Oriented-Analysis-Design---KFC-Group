@@ -17,6 +17,9 @@ public class UserManager {
 
     public boolean addUser(String username, String password, String role) {
         if (doesUserExist(username)) return false;
+        if (isPasswordWeak(password)) {
+            System.out.println("Warning: The chosen password is weak...");
+        }
         String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         switch (role.toUpperCase()) {
             case "OFFICER": users.add(new Officer(username, hash)); return true;
@@ -94,5 +97,15 @@ public class UserManager {
     return users.stream().anyMatch(user -> user.getRole().equalsIgnoreCase(role));
     }
 
+    public boolean modifyUsername(String oldUsername, String newUsername) {
+        if (!doesUserExist(oldUsername) || doesUserExist(newUsername)) return false;
+        for (User user : users) {
+            if (user.getUsername().equals(oldUsername)) {
+                user.setUsername(newUsername);
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
