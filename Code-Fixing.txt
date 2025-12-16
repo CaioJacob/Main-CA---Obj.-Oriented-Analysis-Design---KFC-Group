@@ -1,3 +1,5 @@
+High-Risk Problems
+
 1. Hardcoded database credentials (and duplicated credentials across classes)
 - Problem
   - DB URL, user and password are hardcoded in DatabaseConnection and duplicated in Officer/Lecturer. Credentials in source = security risk and prevents configuration per environment.
@@ -67,3 +69,19 @@ Fix report SQL queries (aggregations and aliases) and validate results
     - Queries return correct counts and module lists on sample data.
     - No query uses boolean-to-int tricks like SUM(expr = 0) or aliases with spaces.
     - Output columns map to ReportConstructor getters reliably.
+
+Medium-Risk Problems
+
+1. SQL alias / ResultSet column-name mismatch
+- Problem
+  - fetchStudentInfo reads ResultSet columns using labels that do not match SQL aliases (e.g., "Enrolled Modules", "Grades"); produces nulls.
+- Resolution
+  - Align ResultSet.getString(...) calls with SQL aliases or change SQL aliases to match getters. Use consistent names: Student, Programme, EnrolledModules, CompletedModulesAndGrades, ToRepeat.
+- Conventional commit
+  - fix(sql): align student report SQL aliases and ResultSet getters
+- Issue title
+  - Fix column aliases and getters in student report query and parser
+- Issue description
+  - Update StudentReportVariables.sql aliases and fetchStudentInfo to use consistent column labels. Ensure OutputStudent uses the same labels when writing headings. Acceptance:
+    - StudentReportVariables.fetchStudentInfo returns non-null values for all fields on sample data.
+    - OutputStudent prints correct values.
