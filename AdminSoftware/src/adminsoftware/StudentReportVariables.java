@@ -22,7 +22,17 @@ public class StudentReportVariables {
     
     // Declared as final so that it can only be assigned to the right query
     
-    public static final String sql = "SELECT CONCAT(s.StudentName, ' ', s.StudentNumber) AS student, s.Programme, GROUP_CONCAT(DISTINCT m.ModuleName SEPARATOR '; ') AS `Enrolled Modules`, GROUP_CONCAT(CONCAT(m.ModuleName, ' ', sm.Grades) SEPARATOR '; ') AS Grades, CASE WHEN SUM(CASE WHEN sm.Grades < 39.99 THEN 1 ELSE 0 END) > 0 THEN 'true' ELSE 'false' END AS `ToRepeat` FROM student s JOIN studentmodule sm ON s.StudentNumber = sm.StudentNumber JOIN module m ON sm.ModuleID = m.ModuleID AND s.Programme = m.Programme WHERE sm.Enrolled = 1 GROUP BY s.StudentNumber, s.Programme;";
+    public static final String sql =
+    "SELECT CONCAT(s.StudentName, ' ', s.StudentNumber) AS Student, " +
+    "s.Programme AS Programme, " +
+    "GROUP_CONCAT(DISTINCT m.ModuleName SEPARATOR '; ') AS EnrolledModules, " +
+    "GROUP_CONCAT(CONCAT(m.ModuleName, ' ', sm.Grades) SEPARATOR '; ') AS CompletedModulesAndGrades, " +
+    "CASE WHEN SUM(CASE WHEN sm.Grades < 40 THEN 1 ELSE 0 END) > 0 THEN 'true' ELSE 'false' END AS ToRepeat " +
+    "FROM student s " +
+    "JOIN studentmodule sm ON s.StudentNumber = sm.StudentNumber " +
+    "JOIN module m ON sm.ModuleID = m.ModuleID AND s.Programme = m.Programme " +
+    "WHERE sm.Enrolled = 1 " +
+    "GROUP BY s.StudentNumber, s.Programme;";
     
     public static List<StudentReportConstructor> fetchStudentInfo(String url, String user, String password) {
     
