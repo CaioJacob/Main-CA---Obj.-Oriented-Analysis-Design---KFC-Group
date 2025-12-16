@@ -85,3 +85,22 @@ Medium-Risk Problems
   - Update StudentReportVariables.sql aliases and fetchStudentInfo to use consistent column labels. Ensure OutputStudent uses the same labels when writing headings. Acceptance:
     - StudentReportVariables.fetchStudentInfo returns non-null values for all fields on sample data.
     - OutputStudent prints correct values.
+
+2. Lecturer & Course report SQL uses non-portable boolean-to-int tricks and ambiguous logic
+- Problem
+  - Queries use expressions like SUM(sm.Enrolled = 0) and CASE WHEN lm.IsTeaching = 0 THEN ... — fragile, non-portable and possibly inverted semantics.
+- Resolution
+  - Rewrite aggregates using COUNT(CASE WHEN ... THEN 1 END) and explicit conditions (IsTeaching = 1 means teaching). Remove aliases with spaces. Add unit test / sample data verification.
+- Conventional commit
+  - fix(sql): rewrite lecturer/course report queries to use explicit conditional aggregates
+- Issue title
+  - Replace boolean-to-int SQL expressions with COUNT(CASE WHEN ...) and fix logical conditions
+- Issue description
+  - Update LecturerReportVariables.sql and CourseReportVariables.sql to:
+    - Use COUNT(CASE WHEN ... THEN 1 END) for counts
+    - Confirm IsTeaching/CanTeach semantics and adjust conditions
+    - Use consistent aliases (ModulesTeaching, NumberOfStudents, ModulesCanTeach)
+    - Add a simple SQL test or sample data to validate counts
+  - Acceptance:
+    - Queries produce expected counts on sample DB.
+    - No SUM(expr = 0) constructs remain.
