@@ -1,0 +1,15 @@
+1. Hardcoded database credentials (and duplicated credentials across classes)
+- Problem
+  - DB URL, user and password are hardcoded in DatabaseConnection and duplicated in Officer/Lecturer. Credentials in source = security risk and prevents configuration per environment.
+- Resolution
+  - Move credentials out of source: read from environment variables or a config file (application.properties). Update DatabaseConnection to read env vars with sensible default fallback. Remove hardcoded creds from Officer/Lecturer and stop passing credentials around — use DatabaseConnection.getConnection() everywhere.
+- Conventional commit
+  - fix(db): externalize database credentials to environment variables
+- Issue title
+  - Externalize DB credentials and remove hardcoded credentials from code
+- Issue description
+  - Move DB connection settings out of source code. Update DatabaseConnection to read JDBC_URL / JDBC_USER / JDBC_PASSWORD from environment variables (with safe defaults for dev). Remove hardcoded URL/user/password fields from Officer and Lecturer and update report output calls to use DatabaseConnection only. Acceptance criteria:
+    - No JDBC credentials stored directly in any .java file.
+    - DatabaseConnection.getConnection() uses env vars when present.
+    - Officer/Lecturer compile and run using DatabaseConnection only
+
