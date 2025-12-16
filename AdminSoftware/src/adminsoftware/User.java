@@ -4,38 +4,20 @@
  */
 package adminsoftware;
 
-/**
- *
- * @author User
- */
 public abstract class User {
     protected String username;
-    protected String password;
+    protected String passwordHash; // store hash, not plain text
     protected String role;
 
-    // Constructor for users
-    
-    public User(String username, String password, String role) {
+    public User(String username, String passwordHash, String role) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.role = role;
     }
 
-    // Getters and setters
-    
-    public void setUsername(String newUsername) {
-        this.username = newUsername;
-    }
-
-    public void setPassword(String newPassword) {
-        this.password = newPassword;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getRole() {
-        return role;
-    }
+    public void setUsername(String newUsername) { this.username = newUsername; }
+    public void setPasswordHash(String newHash) { this.passwordHash = newHash; }
+    public String getUsername() { return username; }
+    public String getRole() { return role; }
+    public String getPasswordHash() { return passwordHash; }
 }

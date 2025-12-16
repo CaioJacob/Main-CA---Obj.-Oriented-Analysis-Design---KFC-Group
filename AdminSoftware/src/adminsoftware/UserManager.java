@@ -4,92 +4,31 @@
  */
 package adminsoftware;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
-/**
- *
- * @author User
- */
+import org.mindrot.jbcrypt.BCrypt;
+import java.util.*;
 
 public class UserManager {
-     
-    // Arraylist storing users
-    
     private List<User> users = new ArrayList<>();
 
-    // Adding our admin to the list
-    
     public UserManager() {
-       users.add(new Admin("admin", "java", this));
+       String adminHash = BCrypt.hashpw("java", BCrypt.gensalt());
+       users.add(new Admin("admin", adminHash, this));
     }
-        
-    private boolean isPasswordWeak(String password) { // Method to create a warning when weak passwords are selected
-        boolean hasLetter = false;
-        boolean hasDigit = false;
-        boolean hasSpecial = false;
 
-        for (int i = 0; i < password.length(); i++) {
-            char ch = password.charAt(i);
-            if (Character.isLetter(ch)) {
-                hasLetter = true;
-            } else if (Character.isDigit(ch)) {
-                hasDigit = true;
-            } else {
-                hasSpecial = true;
-            }
-        }
-
-        return password.length() < 8 || !(hasLetter && hasDigit && hasSpecial);
-    }
-    
-    // To use to add users
-
-    public void addUser(String username, String password, String role) {
-        
-    if (isPasswordWeak(password)) {
-        System.out.println("Warning: The chosen password is weak. If you want an increased security, consider using more than 8 character, a mix of letters, digits, and special characters.");
-    }
-        
+    public boolean addUser(String username, String password, String role) {
+        if (doesUserExist(username)) return false;
+        String hash = BCrypt.hashpw(password, BCrypt.gensalt());
         switch (role.toUpperCase()) {
-            case "ADMIN":
-                System.out.println("Admin creation is not allowed.");
-                break;
-            case "OFFICER":
-                users.add(new Officer(username, password));
-                break;
-            case "LECTURER":
-                users.add(new Lecturer(username, password));
-                break;
-            default:
-                System.out.println("Invalid role.");
+            case "OFFICER": users.add(new Officer(username, hash)); return true;
+            case "LECTURER": users.add(new Lecturer(username, hash)); return true;
+            default: return false;
         }
     }
 
-    // To be used to delete users (admin option)
-    
-
-
-    // To be used to modify username (admin option)
-    
-    public boolean modifyUsername(String oldUsername, String newUsername) {
-        for (User user : users) {
-            if (user.getUsername().equals(oldUsername)) {
-                user.setUsername(newUsername);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // To be used to modify password (admin option)
-    
     public boolean modifyPassword(String username, String newPassword) {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
-                user.setPassword(newPassword);
+                user.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
                 return true;
             }
         }
@@ -98,8 +37,8 @@ public class UserManager {
 
     public Optional<User> getUser(String username, String password) {
         return users.stream()
-                .filter(user -> user.getUsername().equals(username) && user.password.equals(password))
-                .findFirst();
+            .filter(u -> u.getUsername().equals(username) && BCrypt.checkpw(password, u.getPasswordHash()))
+            .findFirst();
     }
 
     // To isolate instances in which menu options must hide (for example, user logins other than admin)
@@ -156,4 +95,4 @@ public class UserManager {
     }
 
 }
-    
+
