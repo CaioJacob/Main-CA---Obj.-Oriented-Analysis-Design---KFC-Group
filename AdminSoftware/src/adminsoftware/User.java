@@ -4,6 +4,8 @@
  */
 package adminsoftware;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public abstract class User {
     protected String username;
     protected String passwordHash; // store hash, not plain text
@@ -16,7 +18,9 @@ public abstract class User {
     }
 
     public void setUsername(String newUsername) { this.username = newUsername; }
-    public void setPasswordHash(String newHash) { this.passwordHash = newHash; }
+    public void setPassword(String plainPassword) {
+        this.passwordHash = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+    }
     public String getUsername() { return username; }
     public String getRole() { return role; }
     public String getPasswordHash() { return passwordHash; }
