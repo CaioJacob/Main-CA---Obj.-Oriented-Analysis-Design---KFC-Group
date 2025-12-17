@@ -5,6 +5,9 @@
 package adminsoftware;
 
 import java.util.Scanner;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 /**
  *
@@ -64,130 +67,148 @@ public class Officer extends User implements MenuOptions {
     }
 
 
-private void generateStudentReport(Scanner scanner) {
-    System.out.println("Select the report format:");
-    System.out.println("1. TXT format");
-    System.out.println("2. CSV format");
-    System.out.println("3. Console output");
-    int formatChoice = scanner.nextInt();
-    scanner.nextLine(); // Move to next line to avoid errors
+    private void generateStudentReport(Scanner scanner) {
+        System.out.println("Select the report format:");
+        System.out.println("1. TXT format");
+        System.out.println("2. CSV format");
+        System.out.println("3. Console output");
+        int formatChoice = scanner.nextInt();
+        scanner.nextLine(); // Move to next line to avoid errors
 
-    String outDir = System.getenv().getOrDefault("REPORTS_DIR", "./reports");
-    java.nio.file.Files.createDirectories(java.nio.file.Paths.get(outDir));
-    String studentFilePath = java.nio.file.Paths.get(outDir, "StudentReport.txt").toString();
-    String studentCSVPath = java.nio.file.Paths.get(outDir, "StudentReport.csv").toString();
- 
-    switch (formatChoice) {
-        case 1:
-            // Generate report in TXT format
-            OutputStudent.studentToFile(studentFilePath);
-            System.out.println("Student report generated in TXT format at " + studentFilePath);
-            break;
-        case 2:
-            // Generate report in CSV format
-            OutputStudent.studentToCSV(studentCSVPath);
-            System.out.println("Student report generated in CSV format at " + studentCSVPath);
-            break;
-        case 3:
-            // Generate report in the console
-            OutputStudent.consoleStudent();
-            break;
-        default:
-            System.out.println("Invalid option. Please select a valid format.");
-            break;
+        String outDir = System.getenv().getOrDefault("REPORTS_DIR", "./reports");
+        try {
+            Files.createDirectories(Paths.get(outDir));
+        } catch (IOException e) {
+            System.err.println("Unable to create reports directory: " + e.getMessage());
+        }
+        String studentFilePath = Paths.get(outDir, "StudentReport.txt").toString();
+        String studentCSVPath = Paths.get(outDir, "StudentReport.csv").toString();
+
+        switch (formatChoice) {
+            case 1:
+                // Generate report in TXT format
+                OutputStudent.studentToFile(studentFilePath);
+                System.out.println("Student report generated in TXT format at " + studentFilePath);
+                break;
+            case 2:
+                // Generate report in CSV format
+                OutputStudent.studentToCSV(studentCSVPath);
+                System.out.println("Student report generated in CSV format at " + studentCSVPath);
+                break;
+            case 3:
+                // Generate report in the console
+                OutputStudent.consoleStudent();
+                break;
+            default:
+                System.out.println("Invalid option. Please select a valid format.");
+                break;
+        }
+    }
+
+    private void generateCourseReport(Scanner scanner) {
+        System.out.println("Select the report format:");
+        System.out.println("1. TXT format");
+        System.out.println("2. CSV format");
+        System.out.println("3. Console output");
+        int formatChoice = scanner.nextInt();
+        scanner.nextLine(); // Move to next line to avoid errors
+
+        String outDir = System.getenv().getOrDefault("REPORTS_DIR", "./reports");
+        try {
+            Files.createDirectories(Paths.get(outDir));
+        } catch (IOException e) {
+            System.err.println("Unable to create reports directory: " + e.getMessage());
+        }
+        String courseFilePath = Paths.get(outDir, "CourseReport.txt").toString();
+        String courseCSVPath = Paths.get(outDir, "CourseReport.csv").toString();
+
+        switch (formatChoice) {
+            case 1:
+                // Generate report in TXT format
+                OutputCourse.coursesToFile(courseFilePath);
+                System.out.println("Report generated in TXT format at " + courseFilePath);
+                break;
+            case 2:
+                // Generate report in CSV format
+                OutputCourse.courseToCSV(courseCSVPath);
+                System.out.println("Report generated in CSV format at " + courseCSVPath);
+                break;
+            case 3:
+                // Generate report in the console
+                OutputCourse.consoleCourse();
+                System.out.println("Report displayed in console.");
+                break;
+            default:
+                System.out.println("Invalid option. Please select a valid format.");
+                break;
+        }
+    }
+
+    private void generateLecturerReport(Scanner scanner) {
+        System.out.println("Select the report format:");
+        System.out.println("1. TXT format");
+        System.out.println("2. CSV format");
+        System.out.println("3. Console output");
+        int formatChoice = scanner.nextInt();
+        scanner.nextLine(); // Move to next line to avoid errors
+
+        String outDir = System.getenv().getOrDefault("REPORTS_DIR", "./reports");
+        try {
+            Files.createDirectories(Paths.get(outDir));
+        } catch (IOException e) {
+            System.err.println("Unable to create reports directory: " + e.getMessage());
+        }
+        String filePath = Paths.get(outDir, "LecturerReport.txt").toString();
+        String csvPath = Paths.get(outDir, "LecturerReport.csv").toString();
+
+        switch (formatChoice) {
+            case 1:
+                // Generate report in TXT format
+                OutputLecturer.outputToFile(filePath);
+                System.out.println("Report generated in TXT format at " + filePath);
+                break;
+            case 2:
+                // Generate report in CSV format
+                OutputLecturer.outputToCSV(csvPath);
+                System.out.println("Report generated in CSV format at " + csvPath);
+                break;
+            case 3:
+                // Generate report in the console
+                OutputLecturer.consoleOutput();
+                break;
+            default:
+                System.out.println("Invalid option. Please select a valid format.");
+                break;
+        }
+    }
+
+    private void changeUsername(Scanner scanner, UserManager userManager) {
+        String oldUsername = getUsername();
+        System.out.println("Enter your new username:");
+        String newUsername = scanner.nextLine();
+        
+        boolean success = userManager.modifyUsername(oldUsername, newUsername);
+        if (success) {
+            System.out.println("Username successfully changed to: " + newUsername);
+            setUsername(newUsername); // Update the username
+        } else {
+            System.out.println("Failed to change username.");
+        }
+    }
+
+    private void changePassword(Scanner scanner, UserManager userManager) {
+        String username = getUsername();
+        System.out.println("Enter your new password:");
+        String newPassword = scanner.nextLine();
+        
+        boolean success = userManager.modifyPassword(username, newPassword);
+        if (success) {
+            System.out.println("Password successfully changed.");
+            // UserManager.modifyPassword already updated the stored user.
+            // Update this instance as well to keep state consistent.
+            setPassword(newPassword);
+        } else {
+            System.out.println("Failed to change password.");
+        }
     }
 }
-
-private void generateCourseReport(Scanner scanner) {
-    System.out.println("Select the report format:");
-    System.out.println("1. TXT format");
-    System.out.println("2. CSV format");
-    System.out.println("3. Console output");
-    int formatChoice = scanner.nextInt();
-    scanner.nextLine(); // Move to next line to avoid errors
-
-    String courseFilePath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\CourseReport.txt";
-    String courseCSVPath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\CourseReport.csv";
-
-    switch (formatChoice) {
-        case 1:
-            // Generate report in TXT format
-            OutputCourse.coursesToFile(url, user, password, courseFilePath);
-            System.out.println("Report generated in TXT format.");
-            break;
-        case 2:
-            // Generate report in CSV format
-            OutputCourse.courseToCSV(url, user, password, courseCSVPath);
-            System.out.println("Report generated in CSV format.");
-            break;
-        case 3:
-            // Generate report in the console
-            OutputCourse.consoleCourse(url, user, password);
-            System.out.println("Report displayed in console.");
-            break;
-        default:
-            System.out.println("Invalid option. Please select a valid format.");
-            break;
-    }
-}
-
-private void generateLecturerReport(Scanner scanner) {
-    System.out.println("Select the report format:");
-    System.out.println("1. TXT format");
-    System.out.println("2. CSV format");
-    System.out.println("3. Console output");
-    int formatChoice = scanner.nextInt();
-    scanner.nextLine(); // Move to next line to avoid errors
-
-    String filePath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\LecturerReport.txt";
-    String csvPath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\LecturerReport.csv";
-
-    switch (formatChoice) {
-        case 1:
-            // Generate report in TXT format
-            OutputLecturer.outputToFile(url, user, password, filePath);
-            System.out.println("Report generated in TXT format at " + filePath);
-            break;
-        case 2:
-            // Generate report in CSV format
-            OutputLecturer.outputToCSV(url, user, password, csvPath);
-            System.out.println("Report generated in CSV format at " + csvPath);
-            break;
-        case 3:
-            // Generate report in the console
-            OutputLecturer.consoleOutput(url, user, password);
-            break;
-        default:
-            System.out.println("Invalid option. Please select a valid format.");
-            break;
-    }
-}
-
-private void changeUsername(Scanner scanner, UserManager userManager) {
-    String oldUsername = getUsername();
-    System.out.println("Enter your new username:");
-    String newUsername = scanner.nextLine();
-    
-    boolean success = userManager.modifyUsername(oldUsername, newUsername);
-    if (success) {
-        System.out.println("Username successfully changed to: " + newUsername);
-        setUsername(newUsername); // Update the username
-    } else {
-        System.out.println("Failed to change username.");
-    }
-}
-
-private void changePassword(Scanner scanner, UserManager userManager) {
-    String username = getUsername();
-    System.out.println("Enter your new password:");
-    String newPassword = scanner.nextLine();
-    
-    boolean success = userManager.modifyPassword(username, newPassword);
-    if (success) {
-        System.out.println("Password successfully changed.");
-        setPassword(newPassword); // Update the password
-    } else {
-        System.out.println("Failed to change password.");
-    }
-}
-    }
