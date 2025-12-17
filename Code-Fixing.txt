@@ -118,3 +118,31 @@ Medium-Risk Problems
   - Make User class provide setPassword(String plainPassword) that performs secure hashing (BCrypt) and stores the hash, OR refactor callers to use UserManager.modifyPassword exclusively. Acceptance:
     - Project compiles without undefined method errors.
     - Password setter stores hashed password.
+
+4. Fragile login menu mapping and duplicated conditional branches in ConsoleMenu
+- Problem
+  - showLoginMenu computes option numbers manually and branches on hard-coded numeric positions (2 vs 3). Adding roles or reordering breaks mapping.
+- Resolution
+  - Build a dynamic List<RoleOption> at runtime mapping displayed number -> role string and dispatch by looking up choice in that list. Simplify logic and make it data-driven.
+- Conventional commit
+  - refactor(ui): make login menu dynamic and map options to roles programmatically
+- Issue title
+  - Refactor ConsoleMenu login options to a dynamic mapping
+- Issue description
+  - Replace numeric ad-hoc logic in showLoginMenu with a map/list that pairs displayed index with role. Ensure Exit option always uses a computed index. Acceptance:
+    - Adding a new role (e.g., "MANAGER") requires only adding to user creation flow; menu auto-shows it.
+    - No fragile if/else by numeric constants.
+
+5. Hardcoded file paths and DB params inside UI classes (Officer, Lecturer)
+- Problem
+  - Officer and Lecturer still include local url/user/password and absolute file paths — environment-dependent and redundant after DatabaseConnection change.
+- Resolution
+  - Remove URL/user/password fields from UI classes; use DatabaseConnection.getConnection() exclusively. Move default export paths to configuration or prompt user for location. Replace absolute paths with relative configurable defaults.
+- Conventional commit
+  - chore(config): remove hardcoded DB creds and file paths from UI classes; use DatabaseConnection and config
+- Issue title
+  - Remove hardcoded file paths and DB params from Officer/Lecturer; use config/env
+- Issue description
+  - Delete local JDBC fields in Officer and Lecturer and remove file path constants. Use DatabaseConnection for DB access and read export paths from an environment variable or prompt. Acceptance:
+    - No hardcoded credentials or absolute user-specific paths in source.
+    - Reports use either configured paths or current working directory by default.
