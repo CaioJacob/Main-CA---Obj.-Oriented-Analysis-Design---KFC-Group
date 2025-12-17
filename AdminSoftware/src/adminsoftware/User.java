@@ -4,8 +4,6 @@
  */
 package adminsoftware;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 /**
  * Base user model used by Admin / Officer / Lecturer.
  * Centralizes password hashing and exposes simple getters/setters required by callers.

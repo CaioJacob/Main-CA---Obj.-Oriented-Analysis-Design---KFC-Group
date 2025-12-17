@@ -125,17 +125,17 @@ public class Officer extends User implements MenuOptions {
         switch (formatChoice) {
             case 1:
                 // Generate report in TXT format
-                OutputCourse.coursesToFile(courseFilePath);
+                OutputCourse.coursesToFile(courseFilePath, "arg2", "arg3", "arg4"); // Replace "arg2", "arg3", "arg4" with actual values
                 System.out.println("Report generated in TXT format at " + courseFilePath);
                 break;
             case 2:
                 // Generate report in CSV format
-                OutputCourse.courseToCSV(courseCSVPath);
+                OutputCourse.courseToCSV(courseCSVPath, "arg2", "arg3", "arg4"); // Replace "arg2", "arg3", "arg4" with actual values
                 System.out.println("Report generated in CSV format at " + courseCSVPath);
                 break;
             case 3:
                 // Generate report in the console
-                OutputCourse.consoleCourse();
+                OutputCourse.consoleCourse("arg1", "arg2", "arg3"); // Replace "arg1", "arg2", "arg3" with actual values
                 System.out.println("Report displayed in console.");
                 break;
             default:
@@ -164,17 +164,17 @@ public class Officer extends User implements MenuOptions {
         switch (formatChoice) {
             case 1:
                 // Generate report in TXT format
-                OutputLecturer.outputToFile(filePath);
+                OutputLecturer.outputToFile(filePath, "arg2", "arg3", "arg4"); // Replace "arg2", "arg3", "arg4" with actual values
                 System.out.println("Report generated in TXT format at " + filePath);
                 break;
             case 2:
                 // Generate report in CSV format
-                OutputLecturer.outputToCSV(csvPath);
+                OutputLecturer.outputToCSV(csvPath, "arg2", "arg3", "arg4"); // Replace "arg2", "arg3", "arg4" with actual values
                 System.out.println("Report generated in CSV format at " + csvPath);
                 break;
             case 3:
                 // Generate report in the console
-                OutputLecturer.consoleOutput();
+                OutputLecturer.consoleOutput("arg1", "arg2", "arg3"); // Replace "arg1", "arg2", "arg3" with actual values
                 break;
             default:
                 System.out.println("Invalid option. Please select a valid format.");

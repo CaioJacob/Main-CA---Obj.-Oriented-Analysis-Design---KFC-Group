@@ -4,15 +4,20 @@
  */
 package adminsoftware;
 
-import org.mindrot.jbcrypt.BCrypt;
 import java.util.*;
 
 public class UserManager {
     private List<User> users = new ArrayList<>();
 
+    // Method to check if a password is weak
+    private boolean isPasswordWeak(String password) {
+        // Example logic: password is weak if it's less than 8 characters
+        return password.length() < 8;
+    }
+
     public UserManager() {
-       String adminHash = BCrypt.hashpw("java", BCrypt.gensalt());
-       users.add(new Admin("admin", adminHash, this));
+       // create admin with plain password; User constructor will hash it
+       users.add(new Admin("admin", "java", this));
     }
 
     public boolean addUser(String username, String password, String role) {
@@ -20,10 +25,10 @@ public class UserManager {
         if (isPasswordWeak(password)) {
             System.out.println("Warning: The chosen password is weak...");
         }
-        String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+        // Do NOT pre-hash here — pass plain password to User constructor which handles hashing
         switch (role.toUpperCase()) {
-            case "OFFICER": users.add(new Officer(username, hash)); return true;
-            case "LECTURER": users.add(new Lecturer(username, hash)); return true;
+            case "OFFICER": users.add(new Officer(username, password)); return true;
+            case "LECTURER": users.add(new Lecturer(username, password)); return true;
             default: return false;
         }
     }
@@ -31,7 +36,7 @@ public class UserManager {
     public boolean modifyPassword(String username, String newPassword) {
         for (User user : users) {
             if (user.getUsername().equals(username)) {
-                user.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+                user.setPassword(newPassword);
                 return true;
             }
         }

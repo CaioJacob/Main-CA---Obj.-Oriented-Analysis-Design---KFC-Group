@@ -6,7 +6,6 @@ package adminsoftware;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -43,7 +42,7 @@ public class OutputLecturer {
     
     public static void consoleOutput(String url, String user, String password) {
     
-    List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo(url, user, password);
+    List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo();
         
     try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement pstmt = conn.prepareStatement(LecturerReportVariables.sql);
@@ -81,7 +80,7 @@ public class OutputLecturer {
     
     public static void outputToFile(String url, String user, String password, String filePath) {
 
-        List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo(url, user, password);
+        List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo();
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(LecturerReportVariables.sql); 
@@ -122,7 +121,7 @@ public class OutputLecturer {
     // Output method to call in Main - report in CSV format
     
     public static void outputToCSV(String url, String user, String password, String csvPath) {
-        List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo(url, user, password);
+        List<LecturerReportConstructor> lecturers = LecturerReportVariables.fetchLecturerInfo();
 
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(LecturerReportVariables.sql);

@@ -7,7 +7,6 @@ package adminsoftware;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -44,7 +43,7 @@ public class OutputCourse {
     
     public static void consoleCourse(String url, String user, String password) {
     
-    List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo(url, user, password);
+    List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo();
         
     try (Connection conn = DatabaseConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(CourseReportVariables.sql);
@@ -62,8 +61,7 @@ public class OutputCourse {
     // Print headings in a file
     
     public static void printHeadingsToFile(ResultSetMetaData metaData, PrintWriter writer) throws SQLException {
-        int columnCount = metaData.getColumnCount();
-       // for (int i = 1; i <= columnCount; i++) {
+        // for (int i = 1; i <= columnCount; i++) {
         //    writer.print(metaData.getColumnLabel(i) + (i == columnCount ? "" : " - "));
        // }
         writer.format("%-30s%-30s%-30s%-30s%-30s\n", "ModuleName", "Programme", "NumOfStudents", "LecturerName", "Classroom");
@@ -89,7 +87,7 @@ public class OutputCourse {
     
     public static void coursesToFile(String url, String user, String password, String courseFilePath) {
 
-        List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo(url, user, password);
+        List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo();
 
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(CourseReportVariables.sql); 
@@ -130,7 +128,7 @@ public class OutputCourse {
     // Output method to call in Main - report in CSV format
     
     public static void courseToCSV(String url, String user, String password, String courseCSVPath) {
-        List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo(url, user, password);
+        List<CourseReportConstructor> courses = CourseReportVariables.fetchModuleInfo();
 
         try (Connection conn = DatabaseConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(CourseReportVariables.sql);

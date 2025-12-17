@@ -90,6 +90,11 @@ is divided into following sections:
                 </not>
             </condition>
         </fail>
+        <dependency>
+    <groupId>org.mindrot</groupId>
+    <artifactId>jbcrypt</artifactId>
+    <version>0.4</version>
+</dependency>
         <j2seproject3:modulename property="module.name" sourcepath="${src.dir}"/>
         <condition property="named.module.internal">
             <and>
