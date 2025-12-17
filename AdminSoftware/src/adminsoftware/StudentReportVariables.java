@@ -34,14 +34,14 @@ public class StudentReportVariables {
     "WHERE sm.Enrolled = 1 " +
     "GROUP BY s.StudentNumber, s.Programme;";
     
-    public static List<StudentReportConstructor> fetchStudentInfo(String url, String user, String password) {
+        public static List<StudentReportConstructor> fetchStudentInfo() {
     
         List<StudentReportConstructor> students = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
-            while (rs.next()) {
+                while (rs.next()) {
                 
                 // Assign values to variable
                 

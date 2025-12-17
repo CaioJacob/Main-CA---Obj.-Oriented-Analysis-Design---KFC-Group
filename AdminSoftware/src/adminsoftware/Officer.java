@@ -11,11 +11,7 @@ import java.util.Scanner;
  * @author User
  */
 public class Officer extends User implements MenuOptions {
-    
-    String url = "jdbc:mysql://localhost:3306/adminsoftware_2";
-    String user = "root";
-    String password = "root24";
-    
+     
     public Officer(String username, String password) {
         super(username, password, "OFFICER");
     }
@@ -76,23 +72,25 @@ private void generateStudentReport(Scanner scanner) {
     int formatChoice = scanner.nextInt();
     scanner.nextLine(); // Move to next line to avoid errors
 
-    String studentFilePath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\StudentReport.txt";
-    String studentCSVPath = "C:\\Users\\User\\Documents\\NetBeansProjects\\adminsoftware\\StudentReport.csv";
-
+    String outDir = System.getenv().getOrDefault("REPORTS_DIR", "./reports");
+    java.nio.file.Files.createDirectories(java.nio.file.Paths.get(outDir));
+    String studentFilePath = java.nio.file.Paths.get(outDir, "StudentReport.txt").toString();
+    String studentCSVPath = java.nio.file.Paths.get(outDir, "StudentReport.csv").toString();
+ 
     switch (formatChoice) {
         case 1:
             // Generate report in TXT format
-            OutputStudent.studentToFile(url, user, password, studentFilePath);
+            OutputStudent.studentToFile(studentFilePath);
             System.out.println("Student report generated in TXT format at " + studentFilePath);
             break;
         case 2:
             // Generate report in CSV format
-            OutputStudent.studentToCSV(url, user, password, studentCSVPath);
+            OutputStudent.studentToCSV(studentCSVPath);
             System.out.println("Student report generated in CSV format at " + studentCSVPath);
             break;
         case 3:
             // Generate report in the console
-            OutputStudent.consoleStudent(url, user, password);
+            OutputStudent.consoleStudent();
             break;
         default:
             System.out.println("Invalid option. Please select a valid format.");

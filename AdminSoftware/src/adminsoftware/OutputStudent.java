@@ -6,141 +6,136 @@ package adminsoftware;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.List;
 
-/**
- *
- * @author User
- */
 public class OutputStudent {
-    
-    // Method to output headings in the console
-    
-    public static void consoleHeadings(ResultSetMetaData metaData) throws SQLException {
-        System.out.format("%-30s%-30s%-30s%-30s%-30s\n", "Student", "Programme", "EnrolledModules", "CompletedModulesAndGrades", "ToRepeatModules");
-    }
 
-    // Method to output rows in the console
-    
-    public static void consoleRowsStudent(List<StudentReportConstructor> students) {
-        for (StudentReportConstructor student : students) {
-            System.out.format("%-30s%-30s%-30s%-30s%-30s\n",
-                student.getStudent(),
-                student.getProgramme(),
-                student.getEnrolledModules(),
-                student.getCompletedModulesAndGrades(),
-                student.getToRepeatModules());
-        }
-    }
-    
-    // Output method to call in Main - Print in the console
-    
-    public static void consoleStudent(String url, String user, String password) {
-    
-    List<StudentReportConstructor> students = StudentReportVariables.fetchStudentInfo(url, user, password);
-        
-    try (Connection conn = DatabaseConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(StudentReportVariables.sql);
-        ResultSet rs = pstmt.executeQuery()) {
-
-        ResultSetMetaData metaData = rs.getMetaData();
-        consoleHeadings(metaData); // Print column headings
-        consoleRowsStudent(students); // Print rows
-    } catch (SQLException e) {
-        System.err.println("Failed to connect to the database or execute the query.");
-        e.printStackTrace();
-    }
-    }
-    
-    // Print headings in a file
-    
-    public static void printHeadingsToFile(ResultSetMetaData metaData, PrintWriter writer) throws SQLException {
-        writer.format("%-30s%-30s%-30s%-30s%-30s\n", "Student", "Programme", "EnrolledModules", "CompletedModulesAndGrades", "ToRepeatModules");
-}
-
-    // Print rows in a file
-    
-    public static void printRowsToFile(List<StudentReportConstructor> students, PrintWriter writer) {
-        for (StudentReportConstructor student : students) {
-            writer.format("%-30s%-30s%-30s%-30s%-30s\n",
-                student.getStudent(),
-                student.getProgramme(),
-                student.getEnrolledModules(),
-                student.getCompletedModulesAndGrades(),
-                student.getToRepeatModules());
-        }
-    }
-
-    // Output method to call in Main - report in a .txt file
-    
-    public static void studentToFile(String url, String user, String password, String studentFilePath) {
-
-        List<StudentReportConstructor> students = StudentReportVariables.fetchStudentInfo(url, user, password);
-
+    /**
+     * Print student report to console using StudentReportVariables.sql
+     */
+    public static void consoleStudent() {
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(StudentReportVariables.sql); 
-             ResultSet rs = pstmt.executeQuery();
-             PrintWriter writer = new PrintWriter(studentFilePath)) {
+             PreparedStatement ps = conn.prepareStatement(StudentReportVariables.sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            ResultSetMetaData metaData = rs.getMetaData();
-            printHeadingsToFile(metaData, writer); // Column headings to file
-            printRowsToFile(students, writer); // Rows information to file
-            
+            ResultSetMetaData md = rs.getMetaData();
+            int cols = md.getColumnCount();
+
+            // header
+            for (int i = 1; i <= cols; i++) {
+                System.out.print(md.getColumnLabel(i));
+                if (i < cols) System.out.print(" | ");
+            }
+            System.out.println();
+            System.out.println("-".repeat(80));
+
+            // rows
+            while (rs.next()) {
+                for (int i = 1; i <= cols; i++) {
+                    String value = rs.getString(i);
+                    System.out.print(value == null ? "" : value);
+                    if (i < cols) System.out.print(" | ");
+                }
+                System.out.println();
+            }
+
         } catch (SQLException e) {
-            System.err.println("SQL error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("DB error while generating student console report: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Write student report to a TXT file (tab-separated)
+     */
+    public static void studentToFile(String studentFilePath) {
+        try {
+            Path parent = Paths.get(studentFilePath).getParent();
+            if (parent != null) Files.createDirectories(parent);
+        } catch (Exception e) {
+            System.err.println("Unable to create output directory: " + e.getMessage());
+        }
+
+        try (PrintWriter writer = new PrintWriter(studentFilePath);
+             Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(StudentReportVariables.sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            ResultSetMetaData md = rs.getMetaData();
+            int cols = md.getColumnCount();
+
+            // header
+            for (int i = 1; i <= cols; i++) {
+                writer.print(md.getColumnLabel(i));
+                if (i < cols) writer.print("\t");
+            }
+            writer.println();
+
+            // rows
+            while (rs.next()) {
+                for (int i = 1; i <= cols; i++) {
+                    String value = rs.getString(i);
+                    writer.print(value == null ? "" : value);
+                    if (i < cols) writer.print("\t");
+                }
+                writer.println();
+            }
+
         } catch (FileNotFoundException e) {
-            System.err.println("File not found error: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    // Headings to CSV
-    
-    public static void printHeadingsToCSV(ResultSetMetaData metaData, PrintWriter writer) throws SQLException {
-        int columnCount = metaData.getColumnCount();
-        for (int i = 1; i <= columnCount; i++) {
-            writer.print("\"" + metaData.getColumnLabel(i) + "\"" + (i == columnCount ? "" : ","));
-        }
-        writer.println(); // Move to the next line to avoid errors
-    }
-
-    // Rows to CSV
-    
-    public static void printRowsToCSV(List<StudentReportConstructor> students, PrintWriter writer) {
-        for (StudentReportConstructor student : students) {
-            writer.println("\"" + student.getStudent() + "\",\"" + student.getProgramme() + "\",\"" + student.getEnrolledModules() + "\",\"" + student.getCompletedModulesAndGrades() + "\",\"" + student.getToRepeatModules() + "\"");
-        }
-    }
-
-    // Output method to call in Main - report in CSV format
-    
-    public static void studentToCSV(String url, String user, String password, String csvPath) {
-        List<StudentReportConstructor> students = StudentReportVariables.fetchStudentInfo(url, user, password);
-
-        try (Connection conn = DatabaseConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(StudentReportVariables.sql);
-            ResultSet rs = pstmt.executeQuery();
-            PrintWriter writer = new PrintWriter(csvPath)) {
-
-            ResultSetMetaData metaData = rs.getMetaData();
-            printHeadingsToCSV(metaData, writer); // Column headings to CSV
-            printRowsToCSV(students, writer); // Rows information to CSV
-            
+            System.err.println("Unable to open file for writing: " + e.getMessage());
         } catch (SQLException e) {
-            System.err.println("Error fetching student report data: "  + e.getMessage());
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("DB error while writing student report file: " + e.getMessage());
         }
+    }
+
+    /**
+     * Write student report to CSV (comma-separated, quoted)
+     */
+    public static void studentToCSV(String csvPath) {
+        try {
+            Path parent = Paths.get(csvPath).getParent();
+            if (parent != null) Files.createDirectories(parent);
+        } catch (Exception e) {
+            System.err.println("Unable to create output directory: " + e.getMessage());
+        }
+
+        try (PrintWriter writer = new PrintWriter(csvPath);
+             Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(StudentReportVariables.sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            ResultSetMetaData md = rs.getMetaData();
+            int cols = md.getColumnCount();
+
+            // header
+            for (int i = 1; i <= cols; i++) {
+                writer.print("\"" + md.getColumnLabel(i).replace("\"", "\"\"") + "\"");
+                if (i < cols) writer.print(",");
+            }
+            writer.println();
+
+            // rows
+            while (rs.next()) {
+                for (int i = 1; i <= cols; i++) {
+                    String value = rs.getString(i);
+                    String safe = value == null ? "" : value.replace("\"", "\"\"");
+                    writer.print("\"" + safe + "\"");
+                    if (i < cols) writer.print(",");
+                }
+                writer.println();
+            }
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Unable to open CSV for writing: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("DB error while writing student CSV report: " + e.getMessage());
+        }
+    }
 }
-    
-}
-    
+
