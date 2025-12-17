@@ -5,7 +5,6 @@
 package adminsoftware;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author User
+ * Lecturer report query and fetcher.
  */
 public class LecturerReportVariables {
     
@@ -30,7 +28,10 @@ public class LecturerReportVariables {
   "LEFT JOIN studentmodule sm ON m.ModuleID = sm.ModuleID " +
   "GROUP BY l.LecturerName, l.LecturerRole;";
         
-    public static List<LecturerReportConstructor> fetchLecturerInfo(String url, String user, String password) {
+    /**
+     * Fetch lecturer information using DatabaseConnection (no DB creds as params).
+     */
+    public static List<LecturerReportConstructor> fetchLecturerInfo() {
     
         List<LecturerReportConstructor> lecturers = new ArrayList<>();
 
@@ -40,8 +41,6 @@ public class LecturerReportVariables {
 
             while (rs.next()) {
                 
-                // Assign values to variables
-                
                 String lecturer = rs.getString("LecturerName");
                 String role = rs.getString("LecturerRole");
                 String modulesTeaching = rs.getString("ModulesTeaching");
@@ -50,11 +49,12 @@ public class LecturerReportVariables {
 
                 lecturers.add(new LecturerReportConstructor(lecturer, role, modulesTeaching, numberOfStudents, modulesCanTeach));
             }
-            } catch (SQLException e) {
-                System.err.println("Error fetching lecturer data: " + e.getMessage());
-            }  
+        } catch (SQLException e) {
+            System.err.println("Error fetching lecturer data: " + e.getMessage());
+            e.printStackTrace();
+        }  
 
-        return lecturers; // Isolate our lecturers
-        }
+        return lecturers;
+    }
 
 }
