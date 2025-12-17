@@ -5,6 +5,8 @@
 package adminsoftware;
 
 import java.util.InputMismatchException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -73,21 +75,18 @@ public class ConsoleMenu {
 
             // Handle user choice
             
-            if (choice == 1) {
-                performLogin("ADMIN");
-            } else if (choice == optionNumber) {
-            exitApplication();
-            } else if (choice < optionNumber) {
-                if (choice == 2 && userManager.hasRole("OFFICER")) {
-                performLogin("OFFICER");
-                } else if (choice == 3 && userManager.hasRole("LECTURER")) {
-                performLogin("LECTURER");  
-                } else if (choice == 2 && userManager.hasRole("LECTURER")) {
-                performLogin("LECTURER");  
-                }
-                } else {
-                System.out.println("Invalid choice. Please select a valid option.");
+            Map<Integer, String> options = new LinkedHashMap<>();
+            int idx = 1;
+            options.put(idx++, "ADMIN");
+            if (userManager.hasRole("OFFICER")) options.put(idx++, "OFFICER");
+            if (userManager.hasRole("LECTURER")) options.put(idx++, "LECTURER");
+            options.put(idx, "EXIT");
+            for (Map.Entry<Integer,String> e : options.entrySet()) {
+                System.out.println(e.getKey() + ". " + (e.getValue().equals("EXIT") ? "Exit Application" : "Login as " + e.getValue()));
             }
+            String role = options.get(choice);
+            if ("EXIT".equals(role)) exitApplication();
+            else performLogin(role);
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a number.");
             scanner.next(); // Prevent errors
